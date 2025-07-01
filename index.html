@@ -174,6 +174,7 @@
                 <option value="Residence Visa - New">Residence Visa - New</option>
                 <option value="Residence Visa - Renewal">Residence Visa - Renewal</option>
                 <option value="Visa Cancellation">Visa Cancellation</option>
+                <option value="Additional Penalty Payment">Additional Penalty Payment</option>
             </select>
         </div>
 
@@ -200,10 +201,23 @@
         </div>
 
         <div id="lastPenaltyPaidDateGroup" class="hidden">
-            <label for="lastPenaltyPaidDate">Last Penalty Paid Date:</label>
+            <label for="lastPenaltyPaidDate">Last Fine Payment Date:</label>
             <input type="date" id="lastPenaltyPaidDate">
         </div>
 
+        <div id="amountClientPaidGroup" class="hidden">
+            <label for="amountClientPaid">Amount Client Paid (AED):</label>
+            <input type="text" id="amountClientPaid" placeholder="e.g., 1000">
+        </div>
+        <div id="actualCostPaidICAGroup" class="hidden">
+            <label for="actualCostPaidICA">Actual Fines Paid in ICA + Service Fee (I/A):</label>
+            <input type="text" id="actualCostPaidICA" placeholder="e.g., 800">
+        </div>
+        <div id="adminFeeCollectedGroup" class="hidden">
+            <label for="adminFeeCollected">Admin Fee Collected (AED):</label>
+            <input type="text" id="adminFeeCollected" placeholder="e.g., 100">
+        </div>
+        
         <div>
             <label for="companyName">Company Name:</label>
             <input type="text" id="companyName" placeholder="e.g., Your Company LLC" required>
@@ -237,47 +251,78 @@
             return diffDays;
         }
 
+        // Custom date formatter function
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) {
+                return "Invalid Date";
+            }
+            return new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).format(date);
+        }
+
         // Function to toggle input field visibility based on transaction type and penalty payment status
         function toggleInputs() {
             const transactionType = document.getElementById('transactionType').value;
+
             const fineTillTodayGroup = document.getElementById('fineTillTodayGroup');
             const visaExpiryInputGroup = document.getElementById('visaExpiryInputGroup');
             const penaltiesPaidBeforeGroup = document.getElementById('penaltiesPaidBeforeGroup');
             const lastPenaltyPaidDateGroup = document.getElementById('lastPenaltyPaidDateGroup');
             const penaltiesPaidYesRadio = document.getElementById('penaltiesPaidYes');
             
+            // New fields for Additional Penalty Payment
+            const amountClientPaidGroup = document.getElementById('amountClientPaidGroup');
+            const actualCostPaidICAGroup = document.getElementById('actualCostPaidICAGroup');
+            const adminFeeCollectedGroup = document.getElementById('adminFeeCollectedGroup');
+
             // --- Reset visibility for all related groups first ---
-            fineTillTodayGroup.classList.remove('hidden'); // Show by default
+            fineTillTodayGroup.classList.add('hidden');
             visaExpiryInputGroup.classList.add('hidden');
             penaltiesPaidBeforeGroup.classList.add('hidden');
             lastPenaltyPaidDateGroup.classList.add('hidden');
+            amountClientPaidGroup.classList.add('hidden');
+            actualCostPaidICAGroup.classList.add('hidden');
+            adminFeeCollectedGroup.classList.add('hidden');
 
             // --- Clear values when fields are hidden to prevent stale data ---
             document.getElementById('visaExpiryDate').value = '';
             document.getElementById('lastPenaltyPaidDate').value = '';
             document.getElementById('fineTillToday').value = ''; 
-            // Removed: penaltiesPaidNoRadio.checked = true; // This line was causing issues by resetting radio buttons
+            document.getElementById('amountClientPaid').value = '';
+            document.getElementById('actualCostPaidICA').value = '';
+            document.getElementById('adminFeeCollected').value = '';
+            // The line to reset penaltiesPaidNo.checked was removed from here to fix radio button issue
+
 
             if (transactionType === "Residence Visa - Renewal" || transactionType === "Visa Cancellation") {
-                fineTillTodayGroup.classList.add('hidden'); // Hide Fines Till Today for these transactions
                 visaExpiryInputGroup.classList.remove('hidden');
                 penaltiesPaidBeforeGroup.classList.remove('hidden');
 
-                // Check radio button state to toggle lastPenaltyPaidDateGroup
                 if (penaltiesPaidYesRadio.checked) {
                     lastPenaltyPaidDateGroup.classList.remove('hidden');
                 } else {
                     lastPenaltyPaidDateGroup.classList.add('hidden');
                 }
+            } else if (transactionType === "Entry Visa with COS" || transactionType === "Change of Status" || transactionType === "Residence Visa - New") {
+                fineTillTodayGroup.classList.remove('hidden'); // Only "Fines Till Today" is relevant for these
+            } else if (transactionType === "Additional Penalty Payment") {
+                amountClientPaidGroup.classList.remove('hidden');
+                actualCostPaidICAGroup.classList.remove('hidden');
+                adminFeeCollectedGroup.classList.remove('hidden');
+                lastPenaltyPaidDateGroup.classList.remove('hidden'); // Last Payment Date is required for this type
             }
         }
 
         // Initialize visibility on page load and attach event listeners
         document.addEventListener('DOMContentLoaded', () => {
-            toggleInputs(); // Initial call
+            toggleInputs(); // Initial call to set up fields based on initial select value
             // Add event listeners to radio buttons to update visibility
             document.getElementById('penaltiesPaidYes').addEventListener('change', toggleInputs);
             document.getElementById('penaltiesPaidNo').addEventListener('change', toggleInputs);
+            // Ensure "No" is checked by default on page load (if not already set in HTML)
+            if (!document.getElementById('penaltiesPaidYes').checked) {
+                document.getElementById('penaltiesPaidNo').checked = true;
+            }
         });
 
         // JavaScript for the calculator logic
@@ -290,6 +335,11 @@
             const penaltiesPaidYes = document.getElementById('penaltiesPaidYes').checked;
             const lastPenaltyPaidDateStr = document.getElementById('lastPenaltyPaidDate').value;
 
+            // New fields for Additional Penalty Payment
+            const amountClientPaidStr = document.getElementById('amountClientPaid').value;
+            const actualCostPaidICAStr = document.getElementById('actualCostPaidICA').value;
+            const adminFeeCollectedStr = document.getElementById('adminFeeCollected').value;
+
             const resultBox = document.getElementById('resultBox');
             const messageBox = document.getElementById('messageBox');
 
@@ -301,7 +351,7 @@
 
             let baseFineInput = 0; // Default to 0 if not applicable
 
-            if (transaction !== "Residence Visa - Renewal" && transaction !== "Visa Cancellation") {
+            if (transaction !== "Residence Visa - Renewal" && transaction !== "Visa Cancellation" && transaction !== "Additional Penalty Payment") {
                 try {
                     baseFineInput = parseFloat(baseFineInputStr);
                     if (isNaN(baseFineInput) || baseFineInput < 0) {
@@ -327,18 +377,82 @@
 
             const today = startOfDay(new Date()); // Today's date (midnight)
             let daysOverdue = 0;
-            let typingFee = 155; // Base typing fee
+            let typingFee = 155; // Base Immigration Service Fee
             let finalOverstayFine = 0; 
             let finalBreakdownNote = "";
             let finalTotalAmount = 0;
 
             const fixedDaysPenaltyCount = 4; // Constant for fixed 4-day penalties
 
-            // This date will now be consistently Today + 4 days for ALL transactions
+            // Default penaltiesCalculatedUntilDate for most types (today + 4 days coverage)
             let penaltiesCalculatedUntilDate = new Date(today);
             penaltiesCalculatedUntilDate.setDate(penaltiesCalculatedUntilDate.getDate() + fixedDaysPenaltyCount);
 
+            let totalFixed4DayPenalty = 0; // Variable to store the sum of 4 days fixed calculation
 
+
+            // --- Logic for new "Additional Penalty Payment" type ---
+            if (transaction === "Additional Penalty Payment") {
+                let amountClientPaid, actualCostPaidICA, adminFeeCollected;
+
+                try {
+                    amountClientPaid = parseFloat(amountClientPaidStr);
+                    actualCostPaidICA = parseFloat(actualCostPaidICAStr);
+                    adminFeeCollected = parseFloat(adminFeeCollectedStr);
+
+                    if (isNaN(amountClientPaid) || amountClientPaid < 0 ||
+                        isNaN(actualCostPaidICA) || actualCostPaidICA < 0 ||
+                        isNaN(adminFeeCollected) || adminFeeCollected < 0) {
+                        messageBox.textContent = "Please enter valid non-negative numbers for all monetary fields.";
+                        messageBox.classList.add('error');
+                        messageBox.style.display = 'block';
+                        return;
+                    }
+                } catch (e) {
+                    messageBox.textContent = "Please enter valid numbers for all monetary fields.";
+                    messageBox.classList.add('error');
+                    messageBox.style.display = 'block';
+                    return;
+                }
+
+                if (!lastPenaltyPaidDateStr) {
+                    messageBox.textContent = "Please enter the Last Fine Payment Date.";
+                    messageBox.classList.add('error');
+                    messageBox.style.display = 'block';
+                    return;
+                }
+
+                const remainingPenalties = actualCostPaidICA + adminFeeCollected - amountClientPaid;
+                finalTotalAmount = remainingPenalties;
+                
+                // Override penaltiesCalculatedUntilDate for this specific transaction type
+                penaltiesCalculatedUntilDate = startOfDay(new Date(lastPenaltyPaidDateStr));
+                
+                finalOverstayFine = 0; // Not applicable for this calculation
+                typingFee = 0; // Not applicable for this calculation
+                finalBreakdownNote = ""; // No detailed breakdown needed for this specific calculation
+
+                const resultText = (
+                    `--- Additional Penalty Payment Summary ---\n` +
+                    `Date of Calculation: ${formatDate(today)}\n\n` +
+                    `Company Name: ${company}\n` +
+                    `Applicant Name: ${applicant}\n\n` +
+                    `Amount Client Paid: AED ${amountClientPaid.toFixed(2)}\n` +
+                    `Actual Fines Paid in ICA + Service Fee (I/A): AED ${actualCostPaidICA.toFixed(2)}\n` +
+                    `Admin Fee Collected: AED ${adminFeeCollected.toFixed(2)}\n` +
+                    `Last Fine Payment Date: ${formatDate(penaltiesCalculatedUntilDate)}\n\n` +
+                    `Remaining Overstay Penalties to be collected: <strong>AED ${remainingPenalties.toFixed(2)}</strong>\n`
+                );
+                
+                resultBox.innerHTML = resultText; // Use innerHTML to render bold tag
+                resultBox.style.display = 'block';
+                messageBox.textContent = "Calculation completed successfully!";
+                messageBox.classList.add('success');
+                messageBox.style.display = 'block';
+                return; // Exit function after handling this specific transaction
+            }
+
+            // --- Logic for existing transaction types ---
             if (transaction === "Entry Visa with COS" || transaction === "Change of Status" || transaction === "Residence Visa - New") {
                 daysOverdue = fixedDaysPenaltyCount; // This is the fixed 4 days for penalty calculation
                 let penaltyFromDays = daysOverdue * 50; // The fixed penalty amount (4 days x 50)
@@ -352,6 +466,7 @@
                 }
                 
                 finalTotalAmount = finalOverstayFine + typingFee + penaltyFromDays;
+                totalFixed4DayPenalty = penaltyFromDays; // Set for display
 
             } else if (transaction === "Residence Visa - Renewal" || transaction === "Visa Cancellation") {
                 if (!visaExpiryDateStr) {
@@ -361,36 +476,65 @@
                     return;
                 }
 
+                const visaExpiryDate = startOfDay(new Date(visaExpiryDateStr)); // Parse here to use consistently
                 let calculationStartDate; // The date FROM which penalties potentially apply
                 let calculationStartDisplayNote = "";
+                let emiratesIdLateFee = 0; // Initialize here for wider scope
+                let dynamicEmiratesIdDays = 0; // To store the effective days used for EID calculation for display
+                let daysFromVisaExpiryToLastPaid = 0; // Initialize for scope
+                const MAX_EID_PENALTY_DAYS_FROM_VISA_EXPIRY = 79; // Define constant here
 
                 if (penaltiesPaidYes) {
                     if (!lastPenaltyPaidDateStr) {
-                        messageBox.textContent = "Please enter the Last Penalty Paid Date.";
+                        messageBox.textContent = "Please enter the Last Fine Payment Date.";
                         messageBox.classList.add('error');
                         messageBox.style.display = 'block';
                         return;
                     }
-                    calculationStartDate = startOfDay(new Date(lastPenaltyPaidDateStr));
-                    calculationStartDisplayNote = `from Last Paid Date: ${lastPenaltyPaidDateStr}`;
+                    const lastPenaltyPaidDate = startOfDay(new Date(lastPenaltyPaidDateStr));
+                    calculationStartDate = lastPenaltyPaidDate;
+                    calculationStartDisplayNote = `from Last Paid Date: ${formatDate(lastPenaltyPaidDate)}`;
 
-                } else {
-                    const visaExpiryDate = startOfDay(new Date(visaExpiryDateStr));
-                    // Penalties start on the 31st day. So add 31 days to visa expiry date.
+                    if (transaction === "Residence Visa - Renewal") {
+                        daysFromVisaExpiryToLastPaid = getDaysDifference(lastPenaltyPaidDate, visaExpiryDate);
+                        
+                        if (daysFromVisaExpiryToLastPaid <= MAX_EID_PENALTY_DAYS_FROM_VISA_EXPIRY) {
+                            const eidPenaltyCutoffDate = new Date(visaExpiryDate);
+                            eidPenaltyCutoffDate.setDate(eidPenaltyCutoffDate.getDate() + MAX_EID_PENALTY_DAYS_FROM_VISA_EXPIRY);
+                            
+                            let effectiveEidPenaltyDays = getDaysDifference(
+                                Math.min(today.getTime(), eidPenaltyCutoffDate.getTime()), 
+                                lastPenaltyPaidDate
+                            );
+                            
+                            if (effectiveEidPenaltyDays >= 0) { 
+                                effectiveEidPenaltyDays += 1; 
+                            } else {
+                                effectiveEidPenaltyDays = 0; 
+                            }
+
+                            effectiveEidPenaltyDays = Math.max(0, effectiveEidPenaltyDays); 
+                            dynamicEmiratesIdDays = effectiveEidPenaltyDays; 
+                            emiratesIdLateFee = Math.min(effectiveEidPenaltyDays * 20, 1000);
+                        }
+                    }
+
+                } else { // penaltiesPaidNo
+                    // Penalties start on the 31st day from visa expiry.
                     calculationStartDate = new Date(visaExpiryDate);
                     calculationStartDate.setDate(calculationStartDate.getDate() + 31);
-                    calculationStartDisplayNote = `from Visa Expiry Date: ${visaExpiryDateStr} + 30 days grace (penalties start on day 31)`;
+                    calculationStartDisplayNote = `from Visa Expiry Date: ${formatDate(visaExpiryDate)} + 30 days grace period`;
                 }
                 
-                // For Tx4 & Tx5, dynamic penalties are calculated until today
                 daysOverdue = getDaysDifference(today, calculationStartDate);
                 
                 let fixedVisaProcessingPenalty = 0;
                 let fixedIDProcessingPenalty = 0;
 
                 // --- LOGIC FOR GRACE PERIOD / NO PENALTIES ---
-                if (daysOverdue <= 0) { // This means today is still within the grace period for penalties
-                    messageBox.textContent = `No penalties apply. Grace period is active until ${calculationStartDate.toLocaleDateString('en-GB')}.`;
+                // If penalties are not yet active for visa AND no EID penalties are calculated (or active)
+                if (daysOverdue <= 0 && emiratesIdLateFee === 0) { 
+                    messageBox.textContent = `No penalties apply. Grace period is active until ${formatDate(calculationStartDate)}.`;
                     messageBox.classList.add('success');
                     messageBox.style.display = 'block';
                     
@@ -406,33 +550,64 @@
                     let calculatedDynamicPenalty = lateVisaRenewalFee; 
 
                     finalBreakdownNote = (
-                        `Dynamic Visa late fee: AED 50 x ${daysOverdue} days = AED ${lateVisaRenewalFee.toFixed(2)}\n` +
+                        `Visa Late Renewal Fee: AED 50 x ${daysOverdue} days = AED ${lateVisaRenewalFee.toFixed(2)}\n` +
                         `(${calculationStartDisplayNote})`
                     );
 
                     // Add Emirates ID fee ONLY for Residence Visa - Renewal for dynamic part
                     if (transaction === "Residence Visa - Renewal") {
-                        const emiratesIdLateFee = Math.min(daysOverdue * 20, 1000);
-                        calculatedDynamicPenalty += emiratesIdLateFee;
-                        finalBreakdownNote += (
-                            `\nDynamic Emirates ID: AED 20 x ${daysOverdue} days (capped at AED 1000) = AED ${emiratesIdLateFee.toFixed(2)}`
-                        );
+                        if (penaltiesPaidYes) { // EID fee already calculated above if Yes
+                            calculatedDynamicPenalty += emiratesIdLateFee;
+                            if (emiratesIdLateFee > 0) {
+                                finalBreakdownNote += (
+                                    `\nEmirates ID Late Renewal Penalties: AED 20 x ${dynamicEmiratesIdDays} days (capped at AED 1000) = AED ${emiratesIdLateFee.toFixed(2)}`
+                                );
+                            }
+                        } else { // EID for No (Standard 29-day grace period)
+                            // For EID, grace period is 29 days, so penalty starts on 30th day relative to visa expiry.
+                            // So, EID days overdue = visa days overdue + 1 (if visa days > 0)
+                            let daysOverdueForEID = daysOverdue + 1; 
+                            if (daysOverdueForEID < 0) daysOverdueForEID = 0; 
+
+                            emiratesIdLateFee = Math.min(daysOverdueForEID * 20, 1000);
+                            calculatedDynamicPenalty += emiratesIdLateFee;
+                            finalBreakdownNote += (
+                                `\nEmirates ID Late Renewal Penalties: AED 20 x ${daysOverdueForEID} days (capped at AED 1000) = AED ${emiratesIdLateFee.toFixed(2)}`
+                            );
+                        }
                     } 
 
                     finalOverstayFine = calculatedDynamicPenalty; // This is the dynamic fine calculated till today
                     
                     // Now, calculate and add the fixed 4-day penalties separately
                     fixedVisaProcessingPenalty = fixedDaysPenaltyCount * 50; // AED 50 per day for 4 days = 200
+                    
+                    // Conditional Fixed Emirates ID Processing Fee (Request 4)
                     if (transaction === "Residence Visa - Renewal") {
-                        fixedIDProcessingPenalty = Math.min(fixedDaysPenaltyCount * 20, 1000); // AED 20 per day for 4 days = 80, capped at 1000
+                        let excludeFixedEID = false;
+                        if (penaltiesPaidYes) {
+                            // If last paid date is beyond 79 days from visa expiry, no fixed EID penalty should be added.
+                            if (daysFromVisaExpiryToLastPaid > MAX_EID_PENALTY_DAYS_FROM_VISA_EXPIRY) {
+                                excludeFixedEID = true; 
+                            }
+                        }
+                        
+                        // If not excluded by the 79-day rule (for 'Yes' case)
+                        // AND if dynamic EID fine hasn't reached its cap of 1000 already.
+                        if (!excludeFixedEID && emiratesIdLateFee < 1000) { 
+                            fixedIDProcessingPenalty = Math.min(fixedDaysPenaltyCount * 20, 1000); 
+                        }
                     }
 
                     finalTotalAmount = finalOverstayFine + typingFee + fixedVisaProcessingPenalty + fixedIDProcessingPenalty;
+                    totalFixed4DayPenalty = fixedVisaProcessingPenalty + fixedIDProcessingPenalty; // Set for display
+
 
                     // Append fixed penalties to breakdown note
                     let fixedPenaltyNote = `\n\n--- Fixed Processing Penalties (4 Days Additional Timeline Coverage) ---\n`;
                     fixedPenaltyNote += `Visa Processing Fee (4 days): AED ${fixedVisaProcessingPenalty.toFixed(2)}\n`;
-                    if (transaction === "Residence Visa - Renewal") {
+                    // Only show Fixed Emirates ID Processing Fee if it was calculated (Request 4)
+                    if (transaction === "Residence Visa - Renewal" && fixedIDProcessingPenalty > 0) { 
                         fixedPenaltyNote += `Emirates ID Processing Fee (4 days): AED ${fixedIDProcessingPenalty.toFixed(2)}\n`;
                     }
                     fixedPenaltyNote += `(These are additional fixed charges for processing)`;
@@ -447,19 +622,20 @@
                 return;
             }
 
-            const todayFormatted = new Date().toLocaleDateString('en-GB'); // Format today's date
+            const todayFormatted = formatDate(today); // Use custom formatter
 
-            const resultText = (
+            let resultText = (
                 `--- Overstay Fine Summary ---\n` +
-                `Date of Calculation: ${todayFormatted}\n` +
-                `Overstay Penalties Calculated Until: ${penaltiesCalculatedUntilDate.toLocaleDateString('en-GB')} (Including 4 days timeline coverage)\n\n` +
+                `Date of Calculation: ${todayFormatted}\n\n` +
                 `Company Name: ${company}\n` +
                 `Applicant Name: ${applicant}\n\n` +
                 `1. Overstay Fines to date: AED ${finalOverstayFine.toFixed(2)}\n` +
-                `2. Immigration Typing Fee: AED ${typingFee.toFixed(2)}\n` +
-                `3. Overstay Covering Timeline:\n${finalBreakdownNote}\n\n` +
+                `2. Immigration Service Fee: AED ${typingFee.toFixed(2)}\n` +
+                `3. Overstay Covering Timeline:\n${finalBreakdownNote}\n\n` + 
+                `Total 4-Day Fixed Charges: <strong>AED ${totalFixed4DayPenalty.toFixed(2)}</strong>\n\n` + 
                 `Total Overstay Penalties: <strong>AED ${finalTotalAmount.toFixed(2)}</strong>\n` +
-                `Note: The above total is *excluding Shams Admin Fee*.`
+                `Note: The above total is *excluding Shams Admin Fee*.\n` + 
+                `Overstay Penalties Calculated Until: ${formatDate(penaltiesCalculatedUntilDate)} (Including 4 days timeline coverage)\n`
             );
 
             resultBox.innerHTML = resultText; // Use innerHTML to render bold tag
