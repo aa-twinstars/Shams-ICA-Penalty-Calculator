@@ -10,7 +10,7 @@
         :root {
             --navy-blue: #000080; /* Standard Navy Blue */
             --light-navy: #0000A0; /* Slightly lighter Navy for better contrast on some elements */
-            --off-white: #F0F8FF;
+            --off-white: #F0F8FF; /* */
         }
 
         /* CSS for styling */
@@ -21,22 +21,22 @@
             background-position: center; /* Center the image */
             background-attachment: fixed; /* Keep image fixed when scrolling */
             color: var(--navy-blue); /* All font color to Navy Blue */
-            display: flex;
+            display: flex; /* */
             flex-direction: column; /* Stack logo, then container */
             justify-content: flex-start; /* Align to top */
             align-items: center; /* Center horizontally */
             min-height: 100vh;
-            margin: 0;
-            padding: 20px;
+            margin: 0; /* */
+            padding: 20px; /* */
             box-sizing: border-box;
         }
         .logo-container {
-            margin-bottom: 25px;
-            text-align: center;
+            margin-bottom: 25px; /* */
+            text-align: center; /* */
         }
         .logo-container img {
             max-width: 250px; /* Adjust logo size */
-            height: auto;
+            height: auto; /* */
         }
         .container {
             background-color: rgba(255, 255, 255, 0.7); /* Lighter transparent white background */
@@ -47,28 +47,28 @@
             width: 100%;
             max-width: 600px; /* Slightly wider */
             border: 1px solid rgba(255, 255, 255, 0.5); /* More visible border */
-            box-sizing: border-box;
+            box-sizing: border-box; /* */
         }
         h1 {
             color: var(--navy-blue); /* Navy Blue for title */
-            text-align: center;
-            margin-bottom: 35px;
+            text-align: center; /* */
+            margin-bottom: 35px; /* */
             font-size: 30px;
             font-weight: 700;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1); /* Lighter text shadow */
         }
         label {
-            display: block;
-            margin-bottom: 8px;
+            display: block; /* */
+            margin-bottom: 8px; /* */
             font-weight: 600;
             color: var(--navy-blue); /* Navy Blue for labels */
         }
         input[type="text"], input[type="date"], select {
             width: calc(100% - 24px); /* Adjust for padding + border */
-            padding: 12px;
-            margin-bottom: 20px;
+            padding: 12px; /* */
+            margin-bottom: 20px; /* */
             border: 1px solid var(--navy-blue); /* Navy Blue border */
-            border-radius: 8px;
+            border-radius: 8px; /* */
             font-size: 16px;
             background-color: rgba(255, 255, 255, 0.9); /* Very light background for fields */
             color: var(--navy-blue); /* Navy Blue for input text */
@@ -76,8 +76,8 @@
             font-family: 'Poppins', sans-serif; /* Apply Poppins to inputs */
         }
         input[type="date"] {
-            -webkit-appearance: none;
-            appearance: none;
+            -webkit-appearance: none; /* */
+            appearance: none; /* */
             cursor: pointer;
         }
         /* Style for date input icon */
@@ -85,64 +85,64 @@
             filter: invert(0); /* Ensure icon is dark on light background */
         }
         .radio-group {
-            margin-bottom: 20px;
+            margin-bottom: 20px; /* */
             color: var(--navy-blue); /* Navy Blue for radio group text */
-            font-weight: 600;
+            font-weight: 600; /* */
         }
         .radio-group label {
-            display: inline-block;
-            margin-right: 15px;
+            display: inline-block; /* */
+            margin-right: 15px; /* */
             font-weight: 400; /* Lighter weight for radio labels */
         }
         .radio-group input[type="radio"] {
-            margin-right: 5px;
+            margin-right: 5px; /* */
             width: auto; /* Override default input width */
         }
 
         button {
             background: linear-gradient(to right, #6A0DAD, #000080); /* Purple to Navy Blue Gradient */
             color: white; /* Keep button text white for contrast */
-            padding: 15px 25px;
-            border: none;
+            padding: 15px 25px; /* */
+            border: none; /* */
             border-radius: 8px;
             cursor: pointer;
             font-size: 19px;
             font-weight: 700;
             width: 100%;
             margin-top: 25px;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease; /* */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* */
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1px; /* */
         }
         button:hover {
             background: linear-gradient(to right, #000080, #6A0DAD); /* Reverse gradient on hover */
-            transform: translateY(-2px);
-            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.4);
+            transform: translateY(-2px); /* */
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.4); /* */
         }
         #resultBox {
             background-color: rgba(255, 255, 255, 0.7); /* Match container background */
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px); /* */
             border: 1px solid rgba(255, 255, 255, 0.5); /* Match container border */
             border-radius: 18px; /* Match container border radius */
             padding: 25px; /* Match container padding */
             margin-top: 35px;
-            white-space: pre-wrap;
+            white-space: pre-wrap; /* */
             font-family: 'Poppins', sans-serif; /* Apply Poppins to result */
-            font-size: 16px;
-            line-height: 1.8;
+            font-size: 16px; /* */
+            line-height: 1.8; /* */
             color: var(--navy-blue); /* Navy Blue for result text */
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); /* Match container shadow */
-            display: none;
+            display: none; /* */
         }
         .message-box {
-            padding: 12px;
-            border-radius: 8px;
+            padding: 12px; /* */
+            border-radius: 8px; /* */
             margin-top: 20px;
             text-align: center;
             font-weight: 600;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Poppins', sans-serif; /* */
             color: white; /* Keep message box text white for contrast on colored backgrounds */
         }
         .message-box.error {
@@ -154,7 +154,7 @@
             border: 1px solid #2ECC71; /* Emerald green */
         }
         .hidden {
-            display: none;
+            display: none; /* */
         }
     </style>
 </head>
@@ -246,7 +246,6 @@
         // Helper function to get difference in days (inclusive of start, exclusive of end for 'days overdue')
         function getDaysDifference(date1, date2) {
             const oneDay = 1000 * 60 * 60 * 24;
-            // Calculate difference in full days
             const diffDays = Math.floor((startOfDay(date1).getTime() - startOfDay(date2).getTime()) / oneDay);
             return diffDays;
         }
@@ -263,13 +262,11 @@
         // Function to toggle input field visibility based on transaction type and penalty payment status
         function toggleInputs() {
             const transactionType = document.getElementById('transactionType').value;
-
             const fineTillTodayGroup = document.getElementById('fineTillTodayGroup');
             const visaExpiryInputGroup = document.getElementById('visaExpiryInputGroup');
             const penaltiesPaidBeforeGroup = document.getElementById('penaltiesPaidBeforeGroup');
             const lastPenaltyPaidDateGroup = document.getElementById('lastPenaltyPaidDateGroup');
             const penaltiesPaidYesRadio = document.getElementById('penaltiesPaidYes');
-            
             // New fields for Additional Penalty Payment
             const amountClientPaidGroup = document.getElementById('amountClientPaidGroup');
             const actualCostPaidICAGroup = document.getElementById('actualCostPaidICAGroup');
@@ -304,7 +301,8 @@
                     lastPenaltyPaidDateGroup.classList.add('hidden');
                 }
             } else if (transactionType === "Entry Visa with COS" || transactionType === "Change of Status" || transactionType === "Residence Visa - New") {
-                fineTillTodayGroup.classList.remove('hidden'); // Only "Fines Till Today" is relevant for these
+                fineTillTodayGroup.classList.remove('hidden');
+                // Only "Fines Till Today" is relevant for these
             } else if (transactionType === "Additional Penalty Payment") {
                 amountClientPaidGroup.classList.remove('hidden');
                 actualCostPaidICAGroup.classList.remove('hidden');
@@ -324,7 +322,6 @@
                 document.getElementById('penaltiesPaidNo').checked = true;
             }
         });
-
         // JavaScript for the calculator logic
         function calculateFine() {
             const baseFineInputStr = document.getElementById('fineTillToday').value;
@@ -342,14 +339,14 @@
 
             const resultBox = document.getElementById('resultBox');
             const messageBox = document.getElementById('messageBox');
-
             // Clear previous results/messages
             resultBox.style.display = 'none';
             resultBox.textContent = '';
             messageBox.style.display = 'none';
             messageBox.className = 'message-box';
 
-            let baseFineInput = 0; // Default to 0 if not applicable
+            let baseFineInput = 0;
+            // Default to 0 if not applicable
 
             if (transaction !== "Residence Visa - Renewal" && transaction !== "Visa Cancellation" && transaction !== "Additional Penalty Payment") {
                 try {
@@ -375,14 +372,16 @@
                 return;
             }
 
-            const today = startOfDay(new Date()); // Today's date (midnight)
+            const today = startOfDay(new Date());
+            // Today's date (midnight)
             let daysOverdue = 0;
             let typingFee = 155; // Base Immigration Service Fee
-            let finalOverstayFine = 0; 
+            let finalOverstayFine = 0;
             let finalBreakdownNote = "";
             let finalTotalAmount = 0;
 
-            const fixedDaysPenaltyCount = 4; // Constant for fixed 4-day penalties
+            const fixedDaysPenaltyCount = 4;
+            // Constant for fixed 4-day penalties
 
             // Default penaltiesCalculatedUntilDate for most types (today + 4 days coverage)
             let penaltiesCalculatedUntilDate = new Date(today);
@@ -394,7 +393,6 @@
             // --- Logic for new "Additional Penalty Payment" type ---
             if (transaction === "Additional Penalty Payment") {
                 let amountClientPaid, actualCostPaidICA, adminFeeCollected;
-
                 try {
                     amountClientPaid = parseFloat(amountClientPaidStr);
                     actualCostPaidICA = parseFloat(actualCostPaidICAStr);
@@ -427,10 +425,11 @@
                 
                 // Override penaltiesCalculatedUntilDate for this specific transaction type
                 penaltiesCalculatedUntilDate = startOfDay(new Date(lastPenaltyPaidDateStr));
-                
                 finalOverstayFine = 0; // Not applicable for this calculation
-                typingFee = 0; // Not applicable for this calculation
-                finalBreakdownNote = ""; // No detailed breakdown needed for this specific calculation
+                typingFee = 0;
+                // Not applicable for this calculation
+                finalBreakdownNote = "";
+                // No detailed breakdown needed for this specific calculation
 
                 const resultText = (
                     `--- Additional Penalty Payment Summary ---\n` +
@@ -443,26 +442,28 @@
                     `Last Fine Payment Date: ${formatDate(penaltiesCalculatedUntilDate)}\n\n` +
                     `Remaining Overstay Penalties to be collected: <strong>AED ${remainingPenalties.toFixed(2)}</strong>\n`
                 );
-                
                 resultBox.innerHTML = resultText; // Use innerHTML to render bold tag
                 resultBox.style.display = 'block';
                 messageBox.textContent = "Calculation completed successfully!";
                 messageBox.classList.add('success');
                 messageBox.style.display = 'block';
-                return; // Exit function after handling this specific transaction
+                return;
+                // Exit function after handling this specific transaction
             }
 
             // --- Logic for existing transaction types ---
             if (transaction === "Entry Visa with COS" || transaction === "Change of Status" || transaction === "Residence Visa - New") {
-                daysOverdue = fixedDaysPenaltyCount; // This is the fixed 4 days for penalty calculation
-                let penaltyFromDays = daysOverdue * 50; // The fixed penalty amount (4 days x 50)
+                daysOverdue = fixedDaysPenaltyCount;
+                // This is the fixed 4 days for penalty calculation
+                let penaltyFromDays = daysOverdue * 50;
+                // The fixed penalty amount (4 days x 50)
                 
-                finalOverstayFine = baseFineInput; // "Overstay Fines to date" is taken from input (previous fines)
+                finalOverstayFine = baseFineInput;
+                // "Overstay Fines to date" is taken from input (previous fines)
                 finalBreakdownNote = `Fixed penalty for 4 days timeline coverage: AED ${penaltyFromDays.toFixed(2)} (AED 50 x ${daysOverdue} days)`;
-                
                 // For Entry Visa with COS, typing fee is doubled
                 if (transaction === "Entry Visa with COS") {
-                    typingFee *= 2; 
+                    typingFee *= 2;
                 }
                 
                 finalTotalAmount = finalOverstayFine + typingFee + penaltyFromDays;
@@ -476,13 +477,18 @@
                     return;
                 }
 
-                const visaExpiryDate = startOfDay(new Date(visaExpiryDateStr)); // Parse here to use consistently
-                let calculationStartDate; // The date FROM which penalties potentially apply
+                const visaExpiryDate = startOfDay(new Date(visaExpiryDateStr));
+                // Parse here to use consistently
+                let calculationStartDate;
+                // The date FROM which penalties potentially apply
                 let calculationStartDisplayNote = "";
                 let emiratesIdLateFee = 0; // Initialize here for wider scope
-                let dynamicEmiratesIdDays = 0; // To store the effective days used for EID calculation for display
-                let daysFromVisaExpiryToLastPaid = 0; // Initialize for scope
-                const MAX_EID_PENALTY_DAYS_FROM_VISA_EXPIRY = 79; // Define constant here
+                let dynamicEmiratesIdDays = 0;
+                // To store the effective days used for EID calculation for display
+                let daysFromVisaExpiryToLastPaid = 0;
+                // Initialize for scope
+                const MAX_EID_PENALTY_DAYS_FROM_VISA_EXPIRY = 79;
+                // Define constant here
 
                 if (penaltiesPaidYes) {
                     if (!lastPenaltyPaidDateStr) {
@@ -492,12 +498,13 @@
                         return;
                     }
                     const lastPenaltyPaidDate = startOfDay(new Date(lastPenaltyPaidDateStr));
-                    calculationStartDate = lastPenaltyPaidDate;
-                    calculationStartDisplayNote = `from Last Paid Date: ${formatDate(lastPenaltyPaidDate)}`;
+                    // MODIFICATION: Start penalty calculation from the day *after* the last payment date.
+                    calculationStartDate = new Date(lastPenaltyPaidDate);
+                    calculationStartDate.setDate(calculationStartDate.getDate() + 1);
 
+                    calculationStartDisplayNote = `from the day after Last Paid Date: ${formatDate(lastPenaltyPaidDate)}`;
                     if (transaction === "Residence Visa - Renewal") {
                         daysFromVisaExpiryToLastPaid = getDaysDifference(lastPenaltyPaidDate, visaExpiryDate);
-                        
                         if (daysFromVisaExpiryToLastPaid <= MAX_EID_PENALTY_DAYS_FROM_VISA_EXPIRY) {
                             const eidPenaltyCutoffDate = new Date(visaExpiryDate);
                             eidPenaltyCutoffDate.setDate(eidPenaltyCutoffDate.getDate() + MAX_EID_PENALTY_DAYS_FROM_VISA_EXPIRY);
@@ -508,45 +515,46 @@
                             );
                             
                             if (effectiveEidPenaltyDays >= 0) { 
-                                effectiveEidPenaltyDays += 1; 
+                                effectiveEidPenaltyDays += 1;
                             } else {
-                                effectiveEidPenaltyDays = 0; 
+                                effectiveEidPenaltyDays = 0;
                             }
 
-                            effectiveEidPenaltyDays = Math.max(0, effectiveEidPenaltyDays); 
+                            effectiveEidPenaltyDays = Math.max(0, effectiveEidPenaltyDays);
                             dynamicEmiratesIdDays = effectiveEidPenaltyDays; 
                             emiratesIdLateFee = Math.min(effectiveEidPenaltyDays * 20, 1000);
                         }
                     }
 
-    } else { // penaltiesPaidNo
-        // Penalties start on the 31st day from visa expiry.
-        calculationStartDate = new Date(visaExpiryDate);
-        calculationStartDate.setDate(calculationStartDate.getDate() + 31);
-        calculationStartDisplayNote = `from Visa Expiry Date: ${formatDate(visaExpiryDate)} + 30 days grace period`;
-    }
-    
-    // MODIFICATION: Add +1 to the daysOverdue calculation to make it inclusive.
-    daysOverdue = getDaysDifference(today, calculationStartDate) + 1; // Corrected line [cite: 147]
-    
-    let fixedVisaProcessingPenalty = 0;
-    let fixedIDProcessingPenalty = 0;
-    
-    // --- LOGIC FOR GRACE PERIOD / NO PENALTIES ---
-    // If penalties are not yet active for visa AND no EID penalties are calculated (or active)
-    if (daysOverdue <= 0 && emiratesIdLateFee === 0) {
-        messageBox.textContent = `No penalties apply. Grace period is active until ${formatDate(calculationStartDate)}.`;
-        messageBox.classList.add('success');
-        messageBox.style.display = 'block';
-        
-        finalOverstayFine = 0;
-        typingFee = 0;
-        fixedVisaProcessingPenalty = 0;
-        fixedIDProcessingPenalty = 0;
-        finalTotalAmount = 0;
-        finalBreakdownNote = "No overstay penalties or processing fees apply as the grace period is still active.";
-    } else {
-        // Calculate dynamic visa late fee (until today only)
+                } else { // penaltiesPaidNo
+                    // Penalties start on the 31st day from visa expiry.
+                    calculationStartDate = new Date(visaExpiryDate);
+                    calculationStartDate.setDate(calculationStartDate.getDate() + 31);
+                    calculationStartDisplayNote = `from Visa Expiry Date: ${formatDate(visaExpiryDate)} + 30 days grace period`;
+                }
+                
+                // To fix the grace period calculation, we add 1 to the days difference to make the count inclusive
+                // of both the start and end dates.
+                daysOverdue = getDaysDifference(today, calculationStartDate) + 1;
+                
+                let fixedVisaProcessingPenalty = 0;
+                let fixedIDProcessingPenalty = 0;
+
+                // --- LOGIC FOR GRACE PERIOD / NO PENALTIES ---
+                // If penalties are not yet active for visa AND no EID penalties are calculated (or active)
+                if (daysOverdue <= 0 && emiratesIdLateFee === 0) { 
+                    messageBox.textContent = `No penalties apply. Grace period is active until ${formatDate(calculationStartDate)}.`;
+                    messageBox.classList.add('success');
+                    messageBox.style.display = 'block';
+                    
+                    finalOverstayFine = 0;
+                    typingFee = 0;
+                    fixedVisaProcessingPenalty = 0;
+                    fixedIDProcessingPenalty = 0;
+                    finalTotalAmount = 0;
+                    finalBreakdownNote = "No overstay penalties or processing fees apply as the grace period is still active.";
+                } else {
+                    // Calculate dynamic visa late fee (until today only)
                     const lateVisaRenewalFee = daysOverdue * 50;
                     let calculatedDynamicPenalty = lateVisaRenewalFee; 
 
@@ -554,7 +562,6 @@
                         `Visa Late Renewal Fee: AED 50 x ${daysOverdue} days = AED ${lateVisaRenewalFee.toFixed(2)}\n` +
                         `(${calculationStartDisplayNote})`
                     );
-
                     // Add Emirates ID fee ONLY for Residence Visa - Renewal for dynamic part
                     if (transaction === "Residence Visa - Renewal") {
                         if (penaltiesPaidYes) { // EID fee already calculated above if Yes
@@ -567,7 +574,7 @@
                         } else { // EID for No (Standard 29-day grace period)
                             // For EID, grace period is 29 days, so penalty starts on 30th day relative to visa expiry.
                             // So, EID days overdue = visa days overdue + 1 (if visa days > 0)
-                            let daysOverdueForEID = daysOverdue + 1; 
+                            let daysOverdueForEID = daysOverdue + 1;
                             if (daysOverdueForEID < 0) daysOverdueForEID = 0; 
 
                             emiratesIdLateFee = Math.min(daysOverdueForEID * 20, 1000);
@@ -578,10 +585,12 @@
                         }
                     } 
 
-                    finalOverstayFine = calculatedDynamicPenalty; // This is the dynamic fine calculated till today
+                    finalOverstayFine = calculatedDynamicPenalty;
+                    // This is the dynamic fine calculated till today
                     
                     // Now, calculate and add the fixed 4-day penalties separately
-                    fixedVisaProcessingPenalty = fixedDaysPenaltyCount * 50; // AED 50 per day for 4 days = 200
+                    fixedVisaProcessingPenalty = fixedDaysPenaltyCount * 50;
+                    // AED 50 per day for 4 days = 200
                     
                     // Conditional Fixed Emirates ID Processing Fee (Request 4)
                     if (transaction === "Residence Visa - Renewal") {
@@ -589,14 +598,14 @@
                         if (penaltiesPaidYes) {
                             // If last paid date is beyond 79 days from visa expiry, no fixed EID penalty should be added.
                             if (daysFromVisaExpiryToLastPaid > MAX_EID_PENALTY_DAYS_FROM_VISA_EXPIRY) {
-                                excludeFixedEID = true; 
+                                excludeFixedEID = true;
                             }
                         }
                         
                         // If not excluded by the 79-day rule (for 'Yes' case)
                         // AND if dynamic EID fine hasn't reached its cap of 1000 already.
                         if (!excludeFixedEID && emiratesIdLateFee < 1000) { 
-                            fixedIDProcessingPenalty = Math.min(fixedDaysPenaltyCount * 20, 1000); 
+                            fixedIDProcessingPenalty = Math.min(fixedDaysPenaltyCount * 20, 1000);
                         }
                     }
 
@@ -612,7 +621,6 @@
                         fixedPenaltyNote += `Emirates ID Processing Fee (4 days): AED ${fixedIDProcessingPenalty.toFixed(2)}\n`;
                     }
                     fixedPenaltyNote += `(These are additional fixed charges for processing)`;
-                    
                     finalBreakdownNote += fixedPenaltyNote;
                 }
 
@@ -623,7 +631,8 @@
                 return;
             }
 
-            const todayFormatted = formatDate(today); // Use custom formatter
+            const todayFormatted = formatDate(today);
+            // Use custom formatter
 
             let resultText = (
                 `--- Overstay Fine Summary ---\n` +
@@ -638,7 +647,6 @@
                 `Note: The above total is *excluding Shams Admin Fee*.\n` + 
                 `Overstay Penalties Calculated Until: ${formatDate(penaltiesCalculatedUntilDate)} (Including 4 days timeline coverage)\n`
             );
-
             resultBox.innerHTML = resultText; // Use innerHTML to render bold tag
             resultBox.style.display = 'block';
             messageBox.textContent = "Calculation completed successfully!";
@@ -648,4 +656,3 @@
     </script>
 </body>
 </html>
-
