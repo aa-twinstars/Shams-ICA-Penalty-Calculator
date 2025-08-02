@@ -519,33 +519,34 @@
                         }
                     }
 
-                } else { // penaltiesPaidNo
-                    // Penalties start on the 31st day from visa expiry.
-                    calculationStartDate = new Date(visaExpiryDate);
-                    calculationStartDate.setDate(calculationStartDate.getDate() + 31);
-                    calculationStartDisplayNote = `from Visa Expiry Date: ${formatDate(visaExpiryDate)} + 30 days grace period`;
-                }
-                
-                daysOverdue = getDaysDifference(today, calculationStartDate);
-                
-                let fixedVisaProcessingPenalty = 0;
-                let fixedIDProcessingPenalty = 0;
-
-                // --- LOGIC FOR GRACE PERIOD / NO PENALTIES ---
-                // If penalties are not yet active for visa AND no EID penalties are calculated (or active)
-                if (daysOverdue <= 0 && emiratesIdLateFee === 0) { 
-                    messageBox.textContent = `No penalties apply. Grace period is active until ${formatDate(calculationStartDate)}.`;
-                    messageBox.classList.add('success');
-                    messageBox.style.display = 'block';
-                    
-                    finalOverstayFine = 0;
-                    typingFee = 0; // No typing fee if no penalties apply at all
-                    fixedVisaProcessingPenalty = 0;
-                    fixedIDProcessingPenalty = 0;
-                    finalTotalAmount = 0;
-                    finalBreakdownNote = "No overstay penalties or processing fees apply as the grace period is still active.";
-                } else {
-                    // Calculate dynamic visa late fee (until today only)
+    } else { // penaltiesPaidNo
+        // Penalties start on the 31st day from visa expiry.
+        calculationStartDate = new Date(visaExpiryDate);
+        calculationStartDate.setDate(calculationStartDate.getDate() + 31);
+        calculationStartDisplayNote = `from Visa Expiry Date: ${formatDate(visaExpiryDate)} + 30 days grace period`;
+    }
+    
+    // MODIFICATION: Add +1 to the daysOverdue calculation to make it inclusive.
+    daysOverdue = getDaysDifference(today, calculationStartDate) + 1; // Corrected line [cite: 147]
+    
+    let fixedVisaProcessingPenalty = 0;
+    let fixedIDProcessingPenalty = 0;
+    
+    // --- LOGIC FOR GRACE PERIOD / NO PENALTIES ---
+    // If penalties are not yet active for visa AND no EID penalties are calculated (or active)
+    if (daysOverdue <= 0 && emiratesIdLateFee === 0) {
+        messageBox.textContent = `No penalties apply. Grace period is active until ${formatDate(calculationStartDate)}.`;
+        messageBox.classList.add('success');
+        messageBox.style.display = 'block';
+        
+        finalOverstayFine = 0;
+        typingFee = 0;
+        fixedVisaProcessingPenalty = 0;
+        fixedIDProcessingPenalty = 0;
+        finalTotalAmount = 0;
+        finalBreakdownNote = "No overstay penalties or processing fees apply as the grace period is still active.";
+    } else {
+        // Calculate dynamic visa late fee (until today only)
                     const lateVisaRenewalFee = daysOverdue * 50;
                     let calculatedDynamicPenalty = lateVisaRenewalFee; 
 
@@ -647,3 +648,4 @@
     </script>
 </body>
 </html>
+
