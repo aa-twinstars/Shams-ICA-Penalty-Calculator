@@ -174,6 +174,7 @@
                 <option value="Residence Visa - New">Residence Visa - New</option>
                 <option value="Residence Visa - Renewal">Residence Visa - Renewal</option>
                 <option value="Visa Cancellation">Visa Cancellation</option>
+                <option value="IC Renewal/ Cancellation">IC Renewal/ Cancellation</option>
                 <option value="Additional Penalty Payment">Additional Penalty Payment</option>
             </select>
         </div>
@@ -223,7 +224,7 @@
             <input type="text" id="companyName" placeholder="e.g., Your Company LLC" required>
         </div>
 
-        <div>
+        <div id="applicantNameGroup">
             <label for="applicantName">Applicant Name:</label>
             <input type="text" id="applicantName" placeholder="e.g., John Doe" required>
         </div>
@@ -267,6 +268,9 @@
             const penaltiesPaidBeforeGroup = document.getElementById('penaltiesPaidBeforeGroup');
             const lastPenaltyPaidDateGroup = document.getElementById('lastPenaltyPaidDateGroup');
             const penaltiesPaidYesRadio = document.getElementById('penaltiesPaidYes');
+            const applicantNameGroup = document.getElementById('applicantNameGroup');
+            const visaExpiryDateLabel = document.querySelector('#visaExpiryInputGroup label');
+
             // New fields for Additional Penalty Payment
             const amountClientPaidGroup = document.getElementById('amountClientPaidGroup');
             const actualCostPaidICAGroup = document.getElementById('actualCostPaidICAGroup');
@@ -280,25 +284,35 @@
             amountClientPaidGroup.classList.add('hidden');
             actualCostPaidICAGroup.classList.add('hidden');
             adminFeeCollectedGroup.classList.add('hidden');
+            applicantNameGroup.classList.remove('hidden'); // Show applicant name by default
 
             // --- Clear values when fields are hidden to prevent stale data ---
             document.getElementById('visaExpiryDate').value = '';
             document.getElementById('lastPenaltyPaidDate').value = '';
-            document.getElementById('fineTillToday').value = ''; 
+            document.getElementById('fineTillToday').value = '';
             document.getElementById('amountClientPaid').value = '';
             document.getElementById('actualCostPaidICA').value = '';
             document.getElementById('adminFeeCollected').value = '';
             // The line to reset penaltiesPaidNo.checked was removed from here to fix radio button issue
 
-
-            if (transactionType === "Residence Visa - Renewal" || transactionType === "Visa Cancellation") {
+            if (transactionType === "Residence Visa - Renewal" || transactionType === "Visa Cancellation" || transactionType === "IC Renewal/ Cancellation") {
                 visaExpiryInputGroup.classList.remove('hidden');
-                penaltiesPaidBeforeGroup.classList.remove('hidden');
 
-                if (penaltiesPaidYesRadio.checked) {
-                    lastPenaltyPaidDateGroup.classList.remove('hidden');
-                } else {
+                if (transactionType === "IC Renewal/ Cancellation") {
+                    // For IC Renewal/Cancellation, we don't need penalty history or applicant name
+                    penaltiesPaidBeforeGroup.classList.add('hidden');
                     lastPenaltyPaidDateGroup.classList.add('hidden');
+                    applicantNameGroup.classList.add('hidden');
+                    visaExpiryDateLabel.textContent = "IC Expiry Date:";
+                } else {
+                    // For other types, we need the penalty history
+                    penaltiesPaidBeforeGroup.classList.remove('hidden');
+                    if (penaltiesPaidYesRadio.checked) {
+                        lastPenaltyPaidDateGroup.classList.remove('hidden');
+                    } else {
+                        lastPenaltyPaidDateGroup.classList.add('hidden');
+                    }
+                    visaExpiryDateLabel.textContent = "Visa Expiry Date:";
                 }
             } else if (transactionType === "Entry Visa with COS" || transactionType === "Change of Status" || transactionType === "Residence Visa - New") {
                 fineTillTodayGroup.classList.remove('hidden');
@@ -348,7 +362,7 @@
             let baseFineInput = 0;
             // Default to 0 if not applicable
 
-            if (transaction !== "Residence Visa - Renewal" && transaction !== "Visa Cancellation" && transaction !== "Additional Penalty Payment") {
+            if (transaction !== "Residence Visa - Renewal" && transaction !== "Visa Cancellation" && transaction !== "Additional Penalty Payment" && transaction !== "IC Renewal/ Cancellation") {
                 try {
                     baseFineInput = parseFloat(baseFineInputStr);
                     if (isNaN(baseFineInput) || baseFineInput < 0) {
@@ -365,11 +379,18 @@
                 }
             }
 
-            if (!company || !applicant) {
-                messageBox.textContent = "Please ensure 'Company Name' and 'Applicant Name' are not empty.";
+            if (!company) {
+                messageBox.textContent = "Please ensure 'Company Name' is not empty.";
                 messageBox.classList.add('error');
                 messageBox.style.display = 'block';
                 return;
+            }
+            // Check for applicant name only if the transaction type requires it
+            if (transaction !== "IC Renewal/ Cancellation" && !applicant) {
+                 messageBox.textContent = "Please ensure 'Applicant Name' is not empty.";
+                 messageBox.classList.add('error');
+                 messageBox.style.display = 'block';
+                 return;
             }
 
             const today = startOfDay(new Date());
@@ -379,6 +400,7 @@
             let finalOverstayFine = 0;
             let finalBreakdownNote = "";
             let finalTotalAmount = 0;
+            let additionalNote = "";
 
             const fixedDaysPenaltyCount = 4;
             // Constant for fixed 4-day penalties
@@ -552,7 +574,19 @@
                     fixedVisaProcessingPenalty = 0;
                     fixedIDProcessingPenalty = 0;
                     finalTotalAmount = 0;
-                    finalBreakdownNote = "No overstay penalties or processing fees apply as the grace period is still active.";
+                    
+                    // Create the grace period result for this section
+                    const gracePeriodResultText = (
+                        `--- Overstay Fine Summary ---\n` +
+                        `Date of Calculation: ${formatDate(today)}\n\n` +
+                        `Company Name: ${company}\n` +
+                        `Applicant Name: ${applicant}\n` +
+                        `Visa Expiry Date: ${formatDate(visaExpiryDate)}\n\n` +
+                        `No penalties apply. Grace period is active until ${formatDate(calculationStartDate)}.\n`
+                    );
+                    resultBox.textContent = gracePeriodResultText;
+                    resultBox.style.display = 'block';
+                    return; // Exit the function here
                 } else {
                     // Calculate dynamic visa late fee (until today only)
                     const lateVisaRenewalFee = daysOverdue * 50;
@@ -624,6 +658,92 @@
                     finalBreakdownNote += fixedPenaltyNote;
                 }
 
+            } else if (transaction === "IC Renewal/ Cancellation") {
+                if (!visaExpiryDateStr) {
+                    messageBox.textContent = "Please enter the IC Expiry Date.";
+                    messageBox.classList.add('error');
+                    messageBox.style.display = 'block';
+                    return;
+                }
+
+                const icExpiryDate = startOfDay(new Date(visaExpiryDateStr));
+                const gracePeriodEndDate = new Date(icExpiryDate);
+                gracePeriodEndDate.setDate(gracePeriodEndDate.getDate() + 30);
+                
+                daysOverdue = getDaysDifference(today, gracePeriodEndDate);
+                let penaltyPeriods = 0;
+                
+                if (daysOverdue > 0) {
+                    penaltyPeriods = Math.ceil(daysOverdue / 30);
+                } else {
+                    daysOverdue = 0; // Set to 0 if still within grace period
+                }
+
+                const icLateFee = penaltyPeriods * 100;
+                let finalPenalty = icLateFee;
+                let finalTypingFee = typingFee;
+
+                // --- Check for advance penalties within 5 days of next period ---
+                const daysRemainingInCurrentPeriod = (penaltyPeriods * 30) - daysOverdue;
+                if (daysRemainingInCurrentPeriod <= 5 && daysOverdue > 0) {
+                     finalPenalty += 100; // Add one more penalty period
+                     finalTypingFee += typingFee; // Add another typing fee
+                     additionalNote = `\n(An extra penalty and service fee have been added as the current period expires within 5 days.)`;
+                }
+
+                finalOverstayFine = finalPenalty;
+                finalTotalAmount = finalPenalty + finalTypingFee;
+
+                // For this transaction type, we will only show the final total and a summary
+                
+                // Override penaltiesCalculatedUntilDate for this specific transaction type to be the last date of the calculated penalty period
+                if (penaltyPeriods > 0) {
+                    penaltiesCalculatedUntilDate = new Date(gracePeriodEndDate);
+                    penaltiesCalculatedUntilDate.setDate(penaltiesCalculatedUntilDate.getDate() + (penaltyPeriods * 30));
+                } else {
+                    penaltiesCalculatedUntilDate = gracePeriodEndDate; // If no penalties, calculated until end of grace period
+                }
+
+
+                if (daysOverdue === 0 && additionalNote === "") {
+                    messageBox.textContent = `No penalties apply. Grace period is active until ${formatDate(gracePeriodEndDate)}.`;
+                    messageBox.classList.add('success');
+                    messageBox.style.display = 'block';
+                    // Create the grace period result for this section
+                    const gracePeriodResultText = (
+                        `--- Late Renewal Fine Summary ---\n` +
+                        `Date of Calculation: ${formatDate(today)}\n\n` +
+                        `Company Name: ${company}\n` +
+                        `IC Expiry Date: ${formatDate(icExpiryDate)}\n\n` +
+                        `No penalties apply. Grace period is active until ${formatDate(gracePeriodEndDate)}.\n`
+                    );
+                    resultBox.textContent = gracePeriodResultText;
+                    resultBox.style.display = 'block';
+                    return;
+                }
+                
+                // Construct the result text for this transaction type
+                let resultText = (
+                    `--- Late Renewal Fine Summary ---\n` +
+                    `Date of Calculation: ${formatDate(today)}\n\n` +
+                    `Company Name: ${company}\n` +
+                    `IC Expiry Date: ${formatDate(icExpiryDate)}\n\n` +
+                    `1. Late Renewal Fines: AED ${finalPenalty.toFixed(2)}\n` +
+                    `2. Immigration Service Fee: AED ${finalTypingFee.toFixed(2)}\n` +
+                    `\n` +
+                    `Total Late Renewal Penalties: <strong>AED ${finalTotalAmount.toFixed(2)}</strong>\n` +
+                    `Note: The above total is *excluding Shams Admin Fee*.` +
+                    `${additionalNote}\n` +
+                    `Late Renewal Penalties Calculated Until: ${formatDate(penaltiesCalculatedUntilDate)}\n`
+                );
+                
+                resultBox.innerHTML = resultText;
+                resultBox.style.display = 'block';
+                messageBox.textContent = "Calculation completed successfully!";
+                messageBox.classList.add('success');
+                messageBox.style.display = 'block';
+                return;
+
             } else {
                 messageBox.textContent = "Invalid transaction type selected.";
                 messageBox.classList.add('error');
@@ -643,9 +763,9 @@
                 `2. Immigration Service Fee: AED ${typingFee.toFixed(2)}\n` +
                 `3. Overstay Covering Timeline:\n${finalBreakdownNote}\n\n` + 
                 `Total 4-Day Fixed Charges: <strong>AED ${totalFixed4DayPenalty.toFixed(2)}</strong>\n\n` + 
-                `Total Overstay Penalties: <strong>AED ${finalTotalAmount.toFixed(2)}</strong>\n` +
+                `Total Overstay Penalties (Including 4 days timeline coverage): <strong>AED ${finalTotalAmount.toFixed(2)}</strong>\n` +
                 `Note: The above total is *excluding Shams Admin Fee*.\n` + 
-                `Overstay Penalties Calculated Until: ${formatDate(penaltiesCalculatedUntilDate)} (Including 4 days timeline coverage)\n`
+                `Overstay Penalties Calculated Until: ${formatDate(penaltiesCalculatedUntilDate)}\n`
             );
             resultBox.innerHTML = resultText; // Use innerHTML to render bold tag
             resultBox.style.display = 'block';
