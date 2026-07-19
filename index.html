@@ -679,7 +679,8 @@
                     daysOverdue = 0; // Set to 0 if still within grace period
                 }
 
-                const icLateFee = penaltyPeriods * 100;
+                const MAX_IC_PENALTY = 1000;
+                const icLateFee = Math.min(penaltyPeriods * 100, MAX_IC_PENALTY);
                 let finalPenalty = icLateFee;
                 let finalTypingFee = typingFee;
 
