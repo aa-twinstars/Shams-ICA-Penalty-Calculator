@@ -175,6 +175,7 @@
                 <option value="Residence Visa - Renewal">Residence Visa - Renewal</option>
                 <option value="Visa Cancellation">Visa Cancellation</option>
                 <option value="IC Renewal/ Cancellation">IC Renewal/ Cancellation</option>
+                <option value="Re-entry Permit">Re-entry Permit</option>
                 <option value="Additional Penalty Payment">Additional Penalty Payment</option>
             </select>
         </div>
@@ -182,6 +183,11 @@
         <div id="fineTillTodayGroup">
             <label for="fineTillToday">Input Fines Till Today (AED):</label>
             <input type="text" id="fineTillToday" placeholder="e.g., 500" required>
+        </div>
+
+        <div id="exitDateGroup" class="hidden">
+            <label for="exitDate">Date of Exit:</label>
+            <input type="date" id="exitDate">
         </div>
 
         <div id="visaExpiryInputGroup" class="hidden">
@@ -269,6 +275,7 @@
             const lastPenaltyPaidDateGroup = document.getElementById('lastPenaltyPaidDateGroup');
             const penaltiesPaidYesRadio = document.getElementById('penaltiesPaidYes');
             const applicantNameGroup = document.getElementById('applicantNameGroup');
+            const exitDateGroup = document.getElementById('exitDateGroup');
             const visaExpiryDateLabel = document.querySelector('#visaExpiryInputGroup label');
 
             // New fields for Additional Penalty Payment
@@ -278,6 +285,7 @@
 
             // --- Reset visibility for all related groups first ---
             fineTillTodayGroup.classList.add('hidden');
+            exitDateGroup.classList.add('hidden');
             visaExpiryInputGroup.classList.add('hidden');
             penaltiesPaidBeforeGroup.classList.add('hidden');
             lastPenaltyPaidDateGroup.classList.add('hidden');
@@ -288,6 +296,7 @@
 
             // --- Clear values when fields are hidden to prevent stale data ---
             document.getElementById('visaExpiryDate').value = '';
+            document.getElementById('exitDate').value = '';
             document.getElementById('lastPenaltyPaidDate').value = '';
             document.getElementById('fineTillToday').value = '';
             document.getElementById('amountClientPaid').value = '';
@@ -317,6 +326,10 @@
             } else if (transactionType === "Entry Visa with COS" || transactionType === "Change of Status" || transactionType === "Residence Visa - New") {
                 fineTillTodayGroup.classList.remove('hidden');
                 // Only "Fines Till Today" is relevant for these
+            } else if (transactionType === "Re-entry Permit") {
+                exitDateGroup.classList.remove('hidden');
+                visaExpiryInputGroup.classList.remove('hidden');
+                visaExpiryDateLabel.textContent = "Residence Visa Expiry Date:";
             } else if (transactionType === "Additional Penalty Payment") {
                 amountClientPaidGroup.classList.remove('hidden');
                 actualCostPaidICAGroup.classList.remove('hidden');
@@ -343,6 +356,7 @@
             const applicant = document.getElementById('applicantName').value.trim();
             const transaction = document.getElementById('transactionType').value;
             const visaExpiryDateStr = document.getElementById('visaExpiryDate').value;
+            const exitDateStr = document.getElementById('exitDate').value;
             const penaltiesPaidYes = document.getElementById('penaltiesPaidYes').checked;
             const lastPenaltyPaidDateStr = document.getElementById('lastPenaltyPaidDate').value;
 
@@ -362,7 +376,7 @@
             let baseFineInput = 0;
             // Default to 0 if not applicable
 
-            if (transaction !== "Residence Visa - Renewal" && transaction !== "Visa Cancellation" && transaction !== "Additional Penalty Payment" && transaction !== "IC Renewal/ Cancellation") {
+            if (transaction !== "Residence Visa - Renewal" && transaction !== "Visa Cancellation" && transaction !== "Additional Penalty Payment" && transaction !== "IC Renewal/ Cancellation" && transaction !== "Re-entry Permit") {
                 try {
                     baseFineInput = parseFloat(baseFineInputStr);
                     if (isNaN(baseFineInput) || baseFineInput < 0) {
@@ -679,18 +693,13 @@
                     daysOverdue = 0; // Set to 0 if still within grace period
                 }
 
-                const MAX_IC_PENALTY = 1000;
-                const icLateFee = Math.min(penaltyPeriods * 100, MAX_IC_PENALTY);
+                const icLateFee = penaltyPeriods * 100;
                 let finalPenalty = icLateFee;
                 let finalTypingFee = typingFee;
 
-                // --- Check for advance penalties within 5 days of next period ---
-                const daysRemainingInCurrentPeriod = (penaltyPeriods * 30) - daysOverdue;
-                if (daysRemainingInCurrentPeriod <= 5 && daysOverdue > 0) {
-                     finalPenalty += 100; // Add one more penalty period
-                     finalTypingFee += typingFee; // Add another typing fee
-                     additionalNote = `\n(An extra penalty and service fee have been added as the current period expires within 5 days.)`;
-                }
+                // Late Renewal Fines are capped at AED 1000 (typing/service fee is not capped)
+                const IC_MAX_LATE_RENEWAL_FINE = 1000;
+                finalPenalty = Math.min(finalPenalty, IC_MAX_LATE_RENEWAL_FINE);
 
                 finalOverstayFine = finalPenalty;
                 finalTotalAmount = finalPenalty + finalTypingFee;
@@ -706,7 +715,7 @@
                 }
 
 
-                if (daysOverdue === 0 && additionalNote === "") {
+                if (daysOverdue === 0) {
                     messageBox.textContent = `No penalties apply. Grace period is active until ${formatDate(gracePeriodEndDate)}.`;
                     messageBox.classList.add('success');
                     messageBox.style.display = 'block';
@@ -729,7 +738,7 @@
                     `Date of Calculation: ${formatDate(today)}\n\n` +
                     `Company Name: ${company}\n` +
                     `IC Expiry Date: ${formatDate(icExpiryDate)}\n\n` +
-                    `1. Late Renewal Fines: AED ${finalPenalty.toFixed(2)}\n` +
+                    `1. Late Renewal Fines: AED ${finalPenalty.toFixed(2)}${finalPenalty >= IC_MAX_LATE_RENEWAL_FINE ? ' (capped at AED 1000)' : ''}\n` +
                     `2. Immigration Service Fee: AED ${finalTypingFee.toFixed(2)}\n` +
                     `\n` +
                     `Total Late Renewal Penalties: <strong>AED ${finalTotalAmount.toFixed(2)}</strong>\n` +
@@ -739,6 +748,80 @@
                 );
                 
                 resultBox.innerHTML = resultText;
+                resultBox.style.display = 'block';
+                messageBox.textContent = "Calculation completed successfully!";
+                messageBox.classList.add('success');
+                messageBox.style.display = 'block';
+                return;
+
+            } else if (transaction === "Re-entry Permit") {
+                if (!exitDateStr) {
+                    messageBox.textContent = "Please enter the Date of Exit.";
+                    messageBox.classList.add('error');
+                    messageBox.style.display = 'block';
+                    return;
+                }
+                if (!visaExpiryDateStr) {
+                    messageBox.textContent = "Please enter the Residence Visa Expiry Date.";
+                    messageBox.classList.add('error');
+                    messageBox.style.display = 'block';
+                    return;
+                }
+
+                const exitDate = startOfDay(new Date(exitDateStr));
+                const residenceVisaExpiry = startOfDay(new Date(visaExpiryDateStr));
+
+                // Residence visa must have at least 30 days of validity remaining from today
+                const visaDaysRemaining = getDaysDifference(residenceVisaExpiry, today);
+                if (visaDaysRemaining < 30) {
+                    messageBox.textContent = "Re-entry permit cannot be processed due to insufficient validity remaining on the residence visa.";
+                    messageBox.classList.add('error');
+                    messageBox.style.display = 'block';
+                    return;
+                }
+
+                if (exitDate.getTime() > today.getTime()) {
+                    messageBox.textContent = "Date of Exit cannot be in the future.";
+                    messageBox.classList.add('error');
+                    messageBox.style.display = 'block';
+                    return;
+                }
+
+                // 180-day grace period from the date of exit; fines start only after it is crossed
+                const REENTRY_GRACE_DAYS = 180;
+                const daysSinceExit = getDaysDifference(today, exitDate);
+                if (daysSinceExit <= REENTRY_GRACE_DAYS) {
+                    messageBox.textContent = "The Re-entry Permit cannot be processed as the applicant has been outside the UAE for less than six months.";
+                    messageBox.classList.add('error');
+                    messageBox.style.display = 'block';
+                    return;
+                }
+
+                // AED 100 for every 30 days (or part thereof) after the 180-day grace period
+                const daysAfterGrace = daysSinceExit - REENTRY_GRACE_DAYS;
+                const penaltyPeriods = Math.ceil(daysAfterGrace / 30);
+                const reentryFine = penaltyPeriods * 100;
+                const immigrationServiceFee = 155;
+                const reentryTotal = reentryFine + immigrationServiceFee;
+
+                penaltiesCalculatedUntilDate = new Date(exitDate);
+                penaltiesCalculatedUntilDate.setDate(penaltiesCalculatedUntilDate.getDate() + REENTRY_GRACE_DAYS + (penaltyPeriods * 30));
+
+                const reentryResultText = (
+                    `--- Re-entry Permit Fine Summary ---\n` +
+                    `Date of Calculation: ${formatDate(today)}\n\n` +
+                    `Company Name: ${company}\n` +
+                    `Applicant Name: ${applicant}\n` +
+                    `Date of Exit: ${formatDate(exitDate)}\n` +
+                    `Residence Visa Expiry Date: ${formatDate(residenceVisaExpiry)}\n\n` +
+                    `1. Re-entry Fines: AED ${reentryFine.toFixed(2)}\n` +
+                    `2. Immigration Service Fee: AED ${immigrationServiceFee.toFixed(2)}\n` +
+                    `\n` +
+                    `Total Re-entry Permit Charges: <strong>AED ${reentryTotal.toFixed(2)}</strong>\n` +
+                    `Note: The above total is *excluding Shams Admin Fee*.\n` +
+                    `Re-entry Fines Calculated Until: ${formatDate(penaltiesCalculatedUntilDate)}\n`
+                );
+                resultBox.innerHTML = reentryResultText;
                 resultBox.style.display = 'block';
                 messageBox.textContent = "Calculation completed successfully!";
                 messageBox.classList.add('success');
